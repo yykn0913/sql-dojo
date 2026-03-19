@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
-import { PICK_COUNT } from "../data/stages";
+import { useState, useMemo, useEffect } from "react";
+import { DIFFICULTY_CONFIG } from "../data/stages";
 import ResultTable from "./ResultTable";
 import SqlEditor from "./SqlEditor";
 import SqlHighlight from "./SqlHighlight";
+import SqlBuilder from "./SqlBuilder";
 
 function resultsEqual(a, b) {
   if (!a || !b) return false;
@@ -11,41 +12,45 @@ function resultsEqual(a, b) {
   return JSON.stringify(a[0].values) === JSON.stringify(b[0].values);
 }
 
-function pickRandom(arr, n) {
-  return [...arr].sort(() => Math.random() - 0.5).slice(0, Math.min(n, arr.length));
+function pickByDifficulty(pool, difficulty) {
+  const config = DIFFICULTY_CONFIG[difficulty];
+  const filtered = pool.filter((p) => config.levels.includes(p.level));
+  const source = filtered.length >= config.pick ? filtered : pool;
+  return [...source].sort(() => Math.random() - 0.5).slice(0, Math.min(config.pick, source.length));
 }
 
-export default function Challenge({ stage, onClear, onBack, runQuery, runDML, runExpected }) {
-  const problems = useMemo(() => pickRandom(stage.problemPool, PICK_COUNT), [stage]);
+export default function Challenge({ stage, difficulty, onClear, onBack, runQuery, runDML, runExpected }) {
+  const problems = useMemo(() => pickByDifficulty(stage.problemPool, difficulty), [stage, difficulty]);
 
   const [problemIdx, setProblemIdx] = useState(0);
   const [query, setQuery] = useState("");
   const [result, setResult] = useState(null);
-  const [judged, setJudged] = useState(null); // 'correct' | 'wrong' | 'error'
+  const [judged, setJudged] = useState(null);
   const [showHint, setShowHint] = useState(false);
   const [gaveUp, setGaveUp] = useState(false);
   const [score, setScore] = useState(0);
   const [gaveUpCount, setGaveUpCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
 
   const problem = problems[problemIdx];
   const isLast = problemIdx === problems.length - 1;
   const isDML = !!problem.verifyQuery;
+  const diffConfig = DIFFICULTY_CONFIG[difficulty];
 
   function handleRun() {
     let userResults, error;
-
     if (isDML) {
       ({ results: userResults, error } = runDML(stage.setup, query, problem.verifyQuery));
     } else {
       ({ results: userResults, error } = runQuery(stage.setup, query));
     }
-
-    if (error) {
-      setResult({ error });
-      setJudged("error");
-      return;
-    }
-
+    if (error) { setResult({ error }); setJudged("error"); return; }
     const expected = runExpected(stage.setup, problem.answer, isDML ? problem.verifyQuery : null);
     const correct = resultsEqual(userResults, expected);
     setResult({ results: userResults });
@@ -58,19 +63,16 @@ export default function Challenge({ stage, onClear, onBack, runQuery, runDML, ru
       onClear({ score, gaveUpCount, total: problems.length });
     } else {
       setProblemIdx((i) => i + 1);
-      setQuery("");
-      setResult(null);
-      setJudged(null);
-      setShowHint(false);
-      setGaveUp(false);
+      setQuery(""); setResult(null); setJudged(null);
+      setShowHint(false); setGaveUp(false);
+      // SqlBuilder は key で再マウントされるのでリセット不要
     }
   }
 
   function handleGiveUp() {
     setGaveUp(true);
     setGaveUpCount((c) => c + 1);
-    setResult(null);
-    setJudged(null);
+    setResult(null); setJudged(null);
   }
 
   const tablepreviews = stage.tableNames.map((name) => ({
@@ -84,7 +86,9 @@ export default function Challenge({ stage, onClear, onBack, runQuery, runDML, ru
         <button className="back-btn" onClick={onBack}>← 戻る</button>
         <div className="stage-info">
           <span>{stage.emoji} Stage {stage.id}: {stage.title}</span>
-          <span className="progress">{problemIdx + 1} / {problems.length}</span>
+          <span className="progress">
+            {diffConfig.emoji} {diffConfig.label} &nbsp;|&nbsp; {problemIdx + 1} / {problems.length}問
+          </span>
         </div>
         <div className="score-badge">スコア: {score}</div>
       </div>
@@ -103,23 +107,17 @@ export default function Challenge({ stage, onClear, onBack, runQuery, runDML, ru
           {showHint && <p className="hint">💡 ヒント: {problem.hint}</p>}
           <div className="question-actions">
             {!showHint && !gaveUp && (
-              <button className="hint-btn" onClick={() => setShowHint(true)}>
-                💡 ヒントを見る
-              </button>
+              <button className="hint-btn" onClick={() => setShowHint(true)}>💡 ヒントを見る</button>
             )}
             {!gaveUp && judged !== "correct" && (
-              <button className="giveup-btn" onClick={handleGiveUp}>
-                🏳️ 諦める
-              </button>
+              <button className="giveup-btn" onClick={handleGiveUp}>🏳️ 諦める</button>
             )}
           </div>
           {gaveUp && (
             <div className="answer-reveal">
               <p className="answer-label">答え</p>
               <SqlHighlight sql={problem.answer} />
-              {problem.explanation && (
-                <p className="explanation">📖 {problem.explanation}</p>
-              )}
+              {problem.explanation && <p className="explanation">📖 {problem.explanation}</p>}
               <button className="next-btn" onClick={handleNext}>
                 {isLast ? "結果を見る →" : "次の問題 →"}
               </button>
@@ -129,12 +127,28 @@ export default function Challenge({ stage, onClear, onBack, runQuery, runDML, ru
 
         {!gaveUp && (
           <section className="panel">
-            <h3>✏️ SQLを入力</h3>
-            <SqlEditor
-              value={query}
-              onChange={setQuery}
-              placeholder={isDML ? "INSERT / UPDATE / DELETE ..." : "SELECT ..."}
-            />
+            <div className="input-mode-header">
+              <h3>{isMobile ? "🧩 トークンを選んで並べよう" : "✏️ SQLを入力"}</h3>
+              <button
+                className="mode-toggle-btn"
+                onClick={() => { setIsMobile((v) => !v); setQuery(""); }}
+              >
+                {isMobile ? "⌨️ キーボード入力" : "📱 モバイルモード"}
+              </button>
+            </div>
+            {isMobile ? (
+              <SqlBuilder
+                key={`${problemIdx}-${problem.id}`}
+                answer={problem.answer}
+                onQueryChange={setQuery}
+              />
+            ) : (
+              <SqlEditor
+                value={query}
+                onChange={setQuery}
+                placeholder={isDML ? "INSERT / UPDATE / DELETE ..." : "SELECT ..."}
+              />
+            )}
             <button className="run-btn" onClick={handleRun} disabled={!query.trim()} style={{ marginTop: "10px" }}>
               ▶ 実行
             </button>
@@ -149,14 +163,20 @@ export default function Challenge({ stage, onClear, onBack, runQuery, runDML, ru
 
             {result.results && <ResultTable results={result.results} />}
 
+            {/* 不正解・エラー時も解説を表示 */}
+            {(judged === "wrong" || judged === "error") && problem.explanation && (
+              <div className="wrong-explanation">
+                <p className="wrong-explanation-label">📖 解説</p>
+                <p>{problem.explanation}</p>
+              </div>
+            )}
+
             {judged === "correct" && (
               <>
                 <div className="model-answer">
                   <p className="model-answer-label">📝 模範解答</p>
                   <SqlHighlight sql={problem.answer} />
-                  {problem.explanation && (
-                    <p className="explanation">📖 {problem.explanation}</p>
-                  )}
+                  {problem.explanation && <p className="explanation">📖 {problem.explanation}</p>}
                 </div>
                 <button className="next-btn" onClick={handleNext}>
                   {isLast ? "結果を見る →" : "次の問題 →"}

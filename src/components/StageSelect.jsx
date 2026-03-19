@@ -1,14 +1,32 @@
 import { stages } from "../data/stages";
+import { DIFFICULTY_CONFIG } from "../data/stages";
 import SqlReference from "./SqlReference";
 
-export default function StageSelect({ clearedStages, onSelect }) {
+export default function StageSelect({ clearedStages, difficulty, onDifficulty, onSelect }) {
   return (
     <div className="home-layout">
-      {/* 左：ステージ選択 */}
       <div className="stage-select">
         <div className="stage-header">
           <h1>🗾 SQL道場</h1>
           <p>ステージを選んで挑戦しよう</p>
+          {/* 難易度セレクター */}
+          <div className="difficulty-selector">
+            {Object.entries(DIFFICULTY_CONFIG).map(([key, cfg]) => (
+              <button
+                key={key}
+                className={`diff-btn ${difficulty === key ? "active" : ""}`}
+                onClick={() => onDifficulty(key)}
+              >
+                {cfg.emoji} {cfg.label}
+              </button>
+            ))}
+          </div>
+          <p className="difficulty-desc">
+            {DIFFICULTY_CONFIG[difficulty].emoji} {DIFFICULTY_CONFIG[difficulty].label}：
+            {difficulty === "easy" && "level 1 の問題から 3問"}
+            {difficulty === "normal" && "level 1〜2 の問題から 4問"}
+            {difficulty === "hard" && "level 2〜3 の問題から 5問"}
+          </p>
         </div>
         <div className="stage-grid">
           {stages.map((stage) => {
@@ -30,7 +48,6 @@ export default function StageSelect({ clearedStages, onSelect }) {
         </div>
       </div>
 
-      {/* 右：SQLリファレンス */}
       <SqlReference />
     </div>
   );

@@ -1,7 +1,14 @@
 // SQL資格（OSS-DB Silver / Oracle SQL）対応の問題構成
 // verifyQuery がある問題はDML系（INSERT/UPDATE/DELETE）
+// level: 1=かんたん 2=ふつう 3=むずかしい
 
 export const PICK_COUNT = 4;
+
+export const DIFFICULTY_CONFIG = {
+  easy:   { label: 'かんたん', emoji: '🌱', levels: [1],    pick: 3 },
+  normal: { label: 'ふつう',   emoji: '⚡', levels: [1, 2], pick: 4 },
+  hard:   { label: 'むずかしい', emoji: '🔥', levels: [2, 3], pick: 5 },
+};
 
 const EMPLOYEES_SETUP = `
   CREATE TABLE departments (dept_id INTEGER PRIMARY KEY, dept_name TEXT NOT NULL);
@@ -29,62 +36,14 @@ export const stages = [
     setup: EMPLOYEES_SETUP,
     tableNames: ["employees"],
     problemPool: [
-      {
-        id: 1,
-        question: "employees テーブルの全データを取得せよ",
-        hint: "SELECT * FROM テーブル名",
-        answer: "SELECT * FROM employees",
-        explanation: "SELECT * は全カラムを取得する最も基本的な構文。",
-      },
-      {
-        id: 2,
-        question: "name と salary だけを取得せよ",
-        hint: "SELECT カラム1, カラム2 FROM ...",
-        answer: "SELECT name, salary FROM employees",
-        explanation: "必要なカラムだけを指定することでデータ転送量を減らせる。",
-      },
-      {
-        id: 3,
-        question: "salary を降順に並べて全件取得せよ",
-        hint: "ORDER BY カラム名 DESC",
-        answer: "SELECT * FROM employees ORDER BY salary DESC",
-        explanation: "DESC = 降順（大→小）。省略すると ASC（昇順）になる。",
-      },
-      {
-        id: 4,
-        question: "salary が低い順に name と salary を取得せよ",
-        hint: "ORDER BY カラム名 ASC（ASCは省略可）",
-        answer: "SELECT name, salary FROM employees ORDER BY salary ASC",
-        explanation: "ASCは昇順（小→大）。ORDER BYのデフォルトはASC。",
-      },
-      {
-        id: 5,
-        question: "salary の高い順に上位3件を取得せよ",
-        hint: "ORDER BY ... DESC LIMIT 数値",
-        answer: "SELECT * FROM employees ORDER BY salary DESC LIMIT 3",
-        explanation: "LIMIT で取得件数を制限する。ORDER BY と組み合わせて上位N件を取得できる。",
-      },
-      {
-        id: 6,
-        question: "dept_id の重複なし一覧を取得せよ",
-        hint: "SELECT DISTINCT カラム名 FROM ...",
-        answer: "SELECT DISTINCT dept_id FROM employees",
-        explanation: "DISTINCT は重複行を除去する。カラムの種類を調べる際によく使う。",
-      },
-      {
-        id: 7,
-        question: "name に「田」を含む社員を取得せよ",
-        hint: "WHERE name LIKE '%田%'",
-        answer: "SELECT * FROM employees WHERE name LIKE '%田%'",
-        explanation: "LIKE演算子のワイルドカード：% は0文字以上の任意文字列。",
-      },
-      {
-        id: 8,
-        question: "age が 30 以上 35 以下の社員を取得せよ",
-        hint: "WHERE age BETWEEN 値1 AND 値2",
-        answer: "SELECT * FROM employees WHERE age BETWEEN 30 AND 35",
-        explanation: "BETWEEN A AND B は A以上B以下（両端を含む）。",
-      },
+      { id: 1, level: 1, question: "employees テーブルの全データを取得せよ", hint: "SELECT * FROM テーブル名", answer: "SELECT * FROM employees", explanation: "SELECT * は全カラムを取得する最も基本的な構文。" },
+      { id: 2, level: 1, question: "name と salary だけを取得せよ", hint: "SELECT カラム1, カラム2 FROM ...", answer: "SELECT name, salary FROM employees", explanation: "必要なカラムだけを指定することでデータ転送量を減らせる。" },
+      { id: 3, level: 1, question: "salary を降順に並べて全件取得せよ", hint: "ORDER BY カラム名 DESC", answer: "SELECT * FROM employees ORDER BY salary DESC", explanation: "DESC = 降順（大→小）。省略すると ASC（昇順）になる。" },
+      { id: 4, level: 1, question: "salary が低い順に name と salary を取得せよ", hint: "ORDER BY カラム名 ASC（ASCは省略可）", answer: "SELECT name, salary FROM employees ORDER BY salary ASC", explanation: "ASCは昇順（小→大）。ORDER BYのデフォルトはASC。" },
+      { id: 5, level: 2, question: "salary の高い順に上位3件を取得せよ", hint: "ORDER BY ... DESC LIMIT 数値", answer: "SELECT * FROM employees ORDER BY salary DESC LIMIT 3", explanation: "LIMIT で取得件数を制限する。ORDER BY と組み合わせて上位N件を取得できる。" },
+      { id: 6, level: 2, question: "dept_id の重複なし一覧を取得せよ", hint: "SELECT DISTINCT カラム名 FROM ...", answer: "SELECT DISTINCT dept_id FROM employees", explanation: "DISTINCT は重複行を除去する。カラムの種類を調べる際によく使う。" },
+      { id: 7, level: 2, question: "name に「田」を含む社員を取得せよ", hint: "WHERE name LIKE '%田%'", answer: "SELECT * FROM employees WHERE name LIKE '%田%'", explanation: "LIKE演算子のワイルドカード：% は0文字以上の任意文字列。" },
+      { id: 8, level: 2, question: "age が 30 以上 35 以下の社員を取得せよ", hint: "WHERE age BETWEEN 値1 AND 値2", answer: "SELECT * FROM employees WHERE age BETWEEN 30 AND 35", explanation: "BETWEEN A AND B は A以上B以下（両端を含む）。" },
     ],
   },
 
@@ -97,62 +56,14 @@ export const stages = [
     setup: EMPLOYEES_SETUP,
     tableNames: ["employees"],
     problemPool: [
-      {
-        id: 1,
-        question: "name を大文字に変換して取得せよ（UPPER関数）",
-        hint: "SELECT UPPER(name) FROM ...",
-        answer: "SELECT UPPER(name) FROM employees",
-        explanation: "UPPER() は文字列を大文字に変換。LOWER() で小文字にできる。",
-      },
-      {
-        id: 2,
-        question: "salary を 1.1 倍した値を name と一緒に取得せよ（列名は new_salary とすること）",
-        hint: "SELECT name, salary * 1.1 AS new_salary FROM ...",
-        answer: "SELECT name, salary * 1.1 AS new_salary FROM employees",
-        explanation: "AS でカラムに別名（エイリアス）を付けられる。計算式も使える。",
-      },
-      {
-        id: 3,
-        question: "salary を 10000 で割った商（小数切り捨て）を取得せよ（CAST か ROUND を使う）",
-        hint: "CAST(salary / 10000 AS INTEGER) または salary / 10000（整数除算）",
-        answer: "SELECT name, CAST(salary / 10000 AS INTEGER) AS salary_man FROM employees",
-        explanation: "CAST(値 AS 型) で型変換。整数同士の割り算は自動的に切り捨てになる場合もある。",
-      },
-      {
-        id: 4,
-        question: "dept_id が 1 なら「営業」、2 なら「開発」、それ以外は「その他」として name と一緒に取得せよ",
-        hint: "CASE WHEN dept_id = 1 THEN '営業' WHEN ... ELSE '...' END",
-        answer: "SELECT name, CASE WHEN dept_id = 1 THEN '営業' WHEN dept_id = 2 THEN '開発' ELSE 'その他' END AS dept_name FROM employees",
-        explanation: "CASE式はSQLの条件分岐。CASE WHEN 条件 THEN 値 ... ELSE デフォルト END の形式。",
-      },
-      {
-        id: 5,
-        question: "salary が 500000 以上なら「高給」、そうでなければ「標準」として name と一緒に取得せよ",
-        hint: "CASE WHEN salary >= 500000 THEN '高給' ELSE '標準' END",
-        answer: "SELECT name, CASE WHEN salary >= 500000 THEN '高給' ELSE '標準' END AS grade FROM employees",
-        explanation: "CASE式で数値の範囲に応じたラベル付けができる。分析系のSQLで頻出。",
-      },
-      {
-        id: 6,
-        question: "name の文字数を取得せよ（LENGTH関数）",
-        hint: "SELECT name, LENGTH(name) FROM ...",
-        answer: "SELECT name, LENGTH(name) AS name_len FROM employees",
-        explanation: "LENGTH() は文字列の長さを返す。SQLiteでは文字数（マルチバイト対応）。",
-      },
-      {
-        id: 7,
-        question: "salary の絶対値を取得せよ（ABS関数）。全件対象",
-        hint: "SELECT ABS(salary) FROM ...",
-        answer: "SELECT name, ABS(salary) AS abs_salary FROM employees",
-        explanation: "ABS() は絶対値を返す数値関数。負の値を扱うテーブルでよく使う。",
-      },
-      {
-        id: 8,
-        question: "dept_id が NULL の社員を取得せよ",
-        hint: "WHERE dept_id IS NULL",
-        answer: "SELECT * FROM employees WHERE dept_id IS NULL",
-        explanation: "NULL との比較は = ではなく IS NULL / IS NOT NULL を使う。",
-      },
+      { id: 1, level: 2, question: "name を大文字に変換して取得せよ（UPPER関数）", hint: "SELECT UPPER(name) FROM ...", answer: "SELECT UPPER(name) FROM employees", explanation: "UPPER() は文字列を大文字に変換。LOWER() で小文字にできる。" },
+      { id: 2, level: 2, question: "salary を 1.1 倍した値を name と一緒に取得せよ（列名は new_salary とすること）", hint: "SELECT name, salary * 1.1 AS new_salary FROM ...", answer: "SELECT name, salary * 1.1 AS new_salary FROM employees", explanation: "AS でカラムに別名（エイリアス）を付けられる。計算式も使える。" },
+      { id: 3, level: 2, question: "salary を 10000 で割った商（小数切り捨て）を取得せよ（CAST か ROUND を使う）", hint: "CAST(salary / 10000 AS INTEGER) または salary / 10000（整数除算）", answer: "SELECT name, CAST(salary / 10000 AS INTEGER) AS salary_man FROM employees", explanation: "CAST(値 AS 型) で型変換。整数同士の割り算は自動的に切り捨てになる場合もある。" },
+      { id: 4, level: 2, question: "dept_id が 1 なら「営業」、2 なら「開発」、それ以外は「その他」として name と一緒に取得せよ", hint: "CASE WHEN dept_id = 1 THEN '営業' WHEN ... ELSE '...' END", answer: "SELECT name, CASE WHEN dept_id = 1 THEN '営業' WHEN dept_id = 2 THEN '開発' ELSE 'その他' END AS dept_name FROM employees", explanation: "CASE式はSQLの条件分岐。CASE WHEN 条件 THEN 値 ... ELSE デフォルト END の形式。" },
+      { id: 5, level: 2, question: "salary が 500000 以上なら「高給」、そうでなければ「標準」として name と一緒に取得せよ", hint: "CASE WHEN salary >= 500000 THEN '高給' ELSE '標準' END", answer: "SELECT name, CASE WHEN salary >= 500000 THEN '高給' ELSE '標準' END AS grade FROM employees", explanation: "CASE式で数値の範囲に応じたラベル付けができる。分析系のSQLで頻出。" },
+      { id: 6, level: 2, question: "name の文字数を取得せよ（LENGTH関数）", hint: "SELECT name, LENGTH(name) FROM ...", answer: "SELECT name, LENGTH(name) AS name_len FROM employees", explanation: "LENGTH() は文字列の長さを返す。SQLiteでは文字数（マルチバイト対応）。" },
+      { id: 7, level: 2, question: "salary の絶対値を取得せよ（ABS関数）。全件対象", hint: "SELECT ABS(salary) FROM ...", answer: "SELECT name, ABS(salary) AS abs_salary FROM employees", explanation: "ABS() は絶対値を返す数値関数。負の値を扱うテーブルでよく使う。" },
+      { id: 8, level: 2, question: "dept_id が NULL の社員を取得せよ", hint: "WHERE dept_id IS NULL", answer: "SELECT * FROM employees WHERE dept_id IS NULL", explanation: "NULL との比較は = ではなく IS NULL / IS NOT NULL を使う。" },
     ],
   },
 
@@ -175,62 +86,14 @@ export const stages = [
     `,
     tableNames: ["sales"],
     problemPool: [
-      {
-        id: 1,
-        question: "売上の総件数を取得せよ",
-        hint: "SELECT COUNT(*) FROM ...",
-        answer: "SELECT COUNT(*) FROM sales",
-        explanation: "COUNT(*) は NULL を含む全行数を返す。COUNT(カラム名) はNULLを除く。",
-      },
-      {
-        id: 2,
-        question: "全売上の合計 amount を取得せよ",
-        hint: "SELECT SUM(カラム名) FROM ...",
-        answer: "SELECT SUM(amount) FROM sales",
-        explanation: "SUM() は合計値を返す集計関数。NULLは無視される。",
-      },
-      {
-        id: 3,
-        question: "売上の最大値・最小値・平均値を1行で取得せよ",
-        hint: "MAX(), MIN(), AVG() を並べる",
-        answer: "SELECT MAX(amount), MIN(amount), AVG(amount) FROM sales",
-        explanation: "複数の集計関数を1つのSELECTに並べられる。",
-      },
-      {
-        id: 4,
-        question: "担当者ごとの売上合計を rep_name 順に取得せよ",
-        hint: "GROUP BY rep_name + SUM + ORDER BY",
-        answer: "SELECT rep_name, SUM(amount) FROM sales GROUP BY rep_name ORDER BY rep_name",
-        explanation: "GROUP BY で行をグループ化し、集計関数を各グループに適用する。",
-      },
-      {
-        id: 5,
-        question: "地域ごとの売上件数と平均 amount を取得せよ",
-        hint: "GROUP BY region + COUNT + AVG",
-        answer: "SELECT region, COUNT(*), AVG(amount) FROM sales GROUP BY region",
-        explanation: "GROUP BY に複数の集計関数を組み合わせられる。",
-      },
-      {
-        id: 6,
-        question: "月ごとの売上合計を月順に取得せよ",
-        hint: "GROUP BY month + SUM + ORDER BY month",
-        answer: "SELECT month, SUM(amount) FROM sales GROUP BY month ORDER BY month",
-        explanation: "GROUP BY と ORDER BY は独立して指定する。",
-      },
-      {
-        id: 7,
-        question: "売上合計が 250000 を超える担当者の名前と合計を取得せよ",
-        hint: "GROUP BY + HAVING SUM(...) > 250000",
-        answer: "SELECT rep_name, SUM(amount) FROM sales GROUP BY rep_name HAVING SUM(amount) > 250000",
-        explanation: "HAVING は GROUP BY 後の条件指定。WHERE はグループ化前、HAVING はグループ化後に使う。",
-      },
-      {
-        id: 8,
-        question: "東京での売上件数が2件以上の担当者を取得せよ",
-        hint: "WHERE region = '東京' + GROUP BY + HAVING COUNT(*) >= 2",
-        answer: "SELECT rep_name, COUNT(*) FROM sales WHERE region = '東京' GROUP BY rep_name HAVING COUNT(*) >= 2",
-        explanation: "WHERE→GROUP BY→HAVING の順で処理される。WHERE で先に絞り込むと効率的。",
-      },
+      { id: 1, level: 2, question: "売上の総件数を取得せよ", hint: "SELECT COUNT(*) FROM ...", answer: "SELECT COUNT(*) FROM sales", explanation: "COUNT(*) は NULL を含む全行数を返す。COUNT(カラム名) はNULLを除く。" },
+      { id: 2, level: 2, question: "全売上の合計 amount を取得せよ", hint: "SELECT SUM(カラム名) FROM ...", answer: "SELECT SUM(amount) FROM sales", explanation: "SUM() は合計値を返す集計関数。NULLは無視される。" },
+      { id: 3, level: 2, question: "売上の最大値・最小値・平均値を1行で取得せよ", hint: "MAX(), MIN(), AVG() を並べる", answer: "SELECT MAX(amount), MIN(amount), AVG(amount) FROM sales", explanation: "複数の集計関数を1つのSELECTに並べられる。" },
+      { id: 4, level: 2, question: "担当者ごとの売上合計を rep_name 順に取得せよ", hint: "GROUP BY rep_name + SUM + ORDER BY", answer: "SELECT rep_name, SUM(amount) FROM sales GROUP BY rep_name ORDER BY rep_name", explanation: "GROUP BY で行をグループ化し、集計関数を各グループに適用する。" },
+      { id: 5, level: 2, question: "地域ごとの売上件数と平均 amount を取得せよ", hint: "GROUP BY region + COUNT + AVG", answer: "SELECT region, COUNT(*), AVG(amount) FROM sales GROUP BY region", explanation: "GROUP BY に複数の集計関数を組み合わせられる。" },
+      { id: 6, level: 2, question: "月ごとの売上合計を月順に取得せよ", hint: "GROUP BY month + SUM + ORDER BY month", answer: "SELECT month, SUM(amount) FROM sales GROUP BY month ORDER BY month", explanation: "GROUP BY と ORDER BY は独立して指定する。" },
+      { id: 7, level: 3, question: "売上合計が 250000 を超える担当者の名前と合計を取得せよ", hint: "GROUP BY + HAVING SUM(...) > 250000", answer: "SELECT rep_name, SUM(amount) FROM sales GROUP BY rep_name HAVING SUM(amount) > 250000", explanation: "HAVING は GROUP BY 後の条件指定。WHERE はグループ化前、HAVING はグループ化後に使う。" },
+      { id: 8, level: 3, question: "東京での売上件数が2件以上の担当者を取得せよ", hint: "WHERE region = '東京' + GROUP BY + HAVING COUNT(*) >= 2", answer: "SELECT rep_name, COUNT(*) FROM sales WHERE region = '東京' GROUP BY rep_name HAVING COUNT(*) >= 2", explanation: "WHERE→GROUP BY→HAVING の順で処理される。WHERE で先に絞り込むと効率的。" },
     ],
   },
 
@@ -243,48 +106,12 @@ export const stages = [
     setup: EMPLOYEES_SETUP,
     tableNames: ["departments", "employees"],
     problemPool: [
-      {
-        id: 1,
-        question: "社員の name と所属する dept_name を取得せよ（所属なしは除く）",
-        hint: "INNER JOIN departments ON employees.dept_id = departments.dept_id",
-        answer: "SELECT employees.name, departments.dept_name FROM employees INNER JOIN departments ON employees.dept_id = departments.dept_id",
-        explanation: "INNER JOIN は両方のテーブルに一致するレコードだけを返す。最も基本的なJOIN。",
-      },
-      {
-        id: 2,
-        question: "全社員の name と dept_name を取得せよ（所属なしは NULL で表示）",
-        hint: "LEFT JOIN を使う",
-        answer: "SELECT employees.name, departments.dept_name FROM employees LEFT JOIN departments ON employees.dept_id = departments.dept_id",
-        explanation: "LEFT JOIN は左テーブルの全行を保持し、一致しない右テーブルの値はNULLになる。",
-      },
-      {
-        id: 3,
-        question: "部門ごとの社員数を dept_name と一緒に取得せよ（社員0人の部門も含む）",
-        hint: "departments を左テーブルにした LEFT JOIN + GROUP BY",
-        answer: "SELECT departments.dept_name, COUNT(employees.id) FROM departments LEFT JOIN employees ON departments.dept_id = employees.dept_id GROUP BY departments.dept_name",
-        explanation: "社員0人の部門を含めるには departments を LEFT JOIN の左側に置く。COUNT(employees.id) はNULLを除くので0になる。",
-      },
-      {
-        id: 4,
-        question: "「開発」部門の社員の name と salary を取得せよ",
-        hint: "INNER JOIN + WHERE dept_name = '開発'",
-        answer: "SELECT employees.name, employees.salary FROM employees INNER JOIN departments ON employees.dept_id = departments.dept_id WHERE departments.dept_name = '開発'",
-        explanation: "JOIN後にWHEREで絞り込める。結合と絞り込みを組み合わせる頻出パターン。",
-      },
-      {
-        id: 5,
-        question: "部門ごとの平均 salary を dept_name と一緒に取得せよ",
-        hint: "INNER JOIN + GROUP BY departments.dept_name + AVG",
-        answer: "SELECT departments.dept_name, AVG(employees.salary) FROM departments INNER JOIN employees ON departments.dept_id = employees.dept_id GROUP BY departments.dept_name",
-        explanation: "JOINした後でGROUP BYできる。JOIN→GROUP BY→集計 の流れ。",
-      },
-      {
-        id: 6,
-        question: "社員ごとの name・dept_name・salary を salary 降順で取得せよ",
-        hint: "INNER JOIN + ORDER BY salary DESC",
-        answer: "SELECT employees.name, departments.dept_name, employees.salary FROM employees INNER JOIN departments ON employees.dept_id = departments.dept_id ORDER BY employees.salary DESC",
-        explanation: "JOIN後のORDER BYはどちらのテーブルのカラムでも指定できる。",
-      },
+      { id: 1, level: 2, question: "社員の name と所属する dept_name を取得せよ（所属なしは除く）", hint: "INNER JOIN departments ON employees.dept_id = departments.dept_id", answer: "SELECT employees.name, departments.dept_name FROM employees INNER JOIN departments ON employees.dept_id = departments.dept_id", explanation: "INNER JOIN は両方のテーブルに一致するレコードだけを返す。最も基本的なJOIN。" },
+      { id: 2, level: 2, question: "全社員の name と dept_name を取得せよ（所属なしは NULL で表示）", hint: "LEFT JOIN を使う", answer: "SELECT employees.name, departments.dept_name FROM employees LEFT JOIN departments ON employees.dept_id = departments.dept_id", explanation: "LEFT JOIN は左テーブルの全行を保持し、一致しない右テーブルの値はNULLになる。" },
+      { id: 3, level: 2, question: "部門ごとの社員数を dept_name と一緒に取得せよ（社員0人の部門も含む）", hint: "departments を左テーブルにした LEFT JOIN + GROUP BY", answer: "SELECT departments.dept_name, COUNT(employees.id) FROM departments LEFT JOIN employees ON departments.dept_id = employees.dept_id GROUP BY departments.dept_name", explanation: "社員0人の部門を含めるには departments を LEFT JOIN の左側に置く。COUNT(employees.id) はNULLを除くので0になる。" },
+      { id: 4, level: 3, question: "「開発」部門の社員の name と salary を取得せよ", hint: "INNER JOIN + WHERE dept_name = '開発'", answer: "SELECT employees.name, employees.salary FROM employees INNER JOIN departments ON employees.dept_id = departments.dept_id WHERE departments.dept_name = '開発'", explanation: "JOIN後にWHEREで絞り込める。結合と絞り込みを組み合わせる頻出パターン。" },
+      { id: 5, level: 3, question: "部門ごとの平均 salary を dept_name と一緒に取得せよ", hint: "INNER JOIN + GROUP BY departments.dept_name + AVG", answer: "SELECT departments.dept_name, AVG(employees.salary) FROM departments INNER JOIN employees ON departments.dept_id = employees.dept_id GROUP BY departments.dept_name", explanation: "JOINした後でGROUP BYできる。JOIN→GROUP BY→集計 の流れ。" },
+      { id: 6, level: 3, question: "社員ごとの name・dept_name・salary を salary 降順で取得せよ", hint: "INNER JOIN + ORDER BY salary DESC", answer: "SELECT employees.name, departments.dept_name, employees.salary FROM employees INNER JOIN departments ON employees.dept_id = departments.dept_id ORDER BY employees.salary DESC", explanation: "JOIN後のORDER BYはどちらのテーブルのカラムでも指定できる。" },
     ],
   },
 
@@ -313,6 +140,7 @@ export const stages = [
     problemPool: [
       {
         id: 1,
+        level: 3,
         question: "全社員の平均 salary より高い社員の name と salary を取得せよ",
         hint: "WHERE salary > (SELECT AVG(salary) FROM employees)",
         answer: "SELECT name, salary FROM employees WHERE salary > (SELECT AVG(salary) FROM employees)",
@@ -320,6 +148,7 @@ export const stages = [
       },
       {
         id: 2,
+        level: 3,
         question: "最も salary が高い社員の name を取得せよ（サブクエリを使え）",
         hint: "WHERE salary = (SELECT MAX(salary) FROM employees)",
         answer: "SELECT name FROM employees WHERE salary = (SELECT MAX(salary) FROM employees)",
@@ -327,6 +156,7 @@ export const stages = [
       },
       {
         id: 3,
+        level: 3,
         question: "プロジェクトを持つ部門の dept_name を重複なしで取得せよ（IN句を使え）",
         hint: "WHERE dept_id IN (SELECT dept_id FROM projects)",
         answer: "SELECT DISTINCT dept_name FROM departments WHERE dept_id IN (SELECT dept_id FROM projects)",
@@ -334,6 +164,7 @@ export const stages = [
       },
       {
         id: 4,
+        level: 3,
         question: "プロジェクトを1件も持たない部門の dept_name を取得せよ（NOT IN を使え）",
         hint: "WHERE dept_id NOT IN (SELECT dept_id FROM projects)",
         answer: "SELECT dept_name FROM departments WHERE dept_id NOT IN (SELECT dept_id FROM projects)",
@@ -341,6 +172,7 @@ export const stages = [
       },
       {
         id: 5,
+        level: 3,
         question: "WITH句で部門別平均給与を定義し、平均が 450000 を超える dept_id と平均給与を取得せよ",
         hint: "WITH avg_sal AS (SELECT dept_id, AVG(salary) AS avg_salary FROM employees GROUP BY dept_id) SELECT ...",
         answer: "WITH avg_sal AS (SELECT dept_id, AVG(salary) AS avg_salary FROM employees GROUP BY dept_id) SELECT dept_id, avg_salary FROM avg_sal WHERE avg_salary > 450000",
@@ -348,6 +180,7 @@ export const stages = [
       },
       {
         id: 6,
+        level: 3,
         question: "WITH句で各部門のプロジェクト合計コストを集計し、dept_name と合計コストを取得せよ",
         hint: "WITH proj_cost AS (...) SELECT dept_name, total FROM proj_cost JOIN departments ...",
         answer: "WITH proj_cost AS (SELECT dept_id, SUM(cost) AS total FROM projects GROUP BY dept_id) SELECT departments.dept_name, proj_cost.total FROM proj_cost INNER JOIN departments ON proj_cost.dept_id = departments.dept_id",
@@ -378,6 +211,7 @@ export const stages = [
     problemPool: [
       {
         id: 1,
+        level: 2,
         question: "products に (6, 'キーボード', '電子機器', 8000, 30) を挿入せよ",
         hint: "INSERT INTO products VALUES (...)",
         answer: "INSERT INTO products VALUES (6, 'キーボード', '電子機器', 8000, 30)",
@@ -386,6 +220,7 @@ export const stages = [
       },
       {
         id: 2,
+        level: 2,
         question: "id=3 の商品の price を 48000 に変更せよ",
         hint: "UPDATE products SET price = ... WHERE id = ...",
         answer: "UPDATE products SET price = 48000 WHERE id = 3",
@@ -394,6 +229,7 @@ export const stages = [
       },
       {
         id: 3,
+        level: 2,
         question: "stock が 5 以下の商品の stock を 20 に更新せよ",
         hint: "UPDATE products SET stock = 20 WHERE stock <= 5",
         answer: "UPDATE products SET stock = 20 WHERE stock <= 5",
@@ -402,6 +238,7 @@ export const stages = [
       },
       {
         id: 4,
+        level: 3,
         question: "category が「家具」の商品を全て削除せよ",
         hint: "DELETE FROM products WHERE category = '...'",
         answer: "DELETE FROM products WHERE category = '家具'",
@@ -410,6 +247,7 @@ export const stages = [
       },
       {
         id: 5,
+        level: 3,
         question: "id=2 の商品の price を 2500 に、stock を 60 に同時に更新せよ",
         hint: "UPDATE ... SET price = ..., stock = ... WHERE ...",
         answer: "UPDATE products SET price = 2500, stock = 60 WHERE id = 2",
@@ -418,6 +256,7 @@ export const stages = [
       },
       {
         id: 6,
+        level: 3,
         question: "price が 100000 を超える商品を削除せよ",
         hint: "DELETE FROM products WHERE price > 100000",
         answer: "DELETE FROM products WHERE price > 100000",
@@ -449,6 +288,7 @@ export const stages = [
     problemPool: [
       {
         id: 1,
+        level: 2,
         question: "id (INTEGER PRIMARY KEY), title (TEXT NOT NULL), price (INTEGER) の3カラムを持つ books テーブルを作成せよ",
         hint: "CREATE TABLE books (id INTEGER PRIMARY KEY, ...)",
         answer: "CREATE TABLE books (id INTEGER PRIMARY KEY, title TEXT NOT NULL, price INTEGER)",
@@ -457,6 +297,7 @@ export const stages = [
       },
       {
         id: 2,
+        level: 2,
         question: "customers テーブルに phone TEXT カラムを追加せよ",
         hint: "ALTER TABLE customers ADD COLUMN phone TEXT",
         answer: "ALTER TABLE customers ADD COLUMN phone TEXT",
@@ -465,6 +306,7 @@ export const stages = [
       },
       {
         id: 3,
+        level: 2,
         question: "age が 30 以上の customers を返すビュー senior_customers を作成せよ",
         hint: "CREATE VIEW senior_customers AS SELECT ...",
         answer: "CREATE VIEW senior_customers AS SELECT * FROM customers WHERE age >= 30",
@@ -473,6 +315,7 @@ export const stages = [
       },
       {
         id: 4,
+        level: 3,
         question: "id (INTEGER PRIMARY KEY), order_id (INTEGER NOT NULL), customer_id (INTEGER), amount (INTEGER CHECK(amount > 0)) を持つ order_items テーブルを作成せよ",
         hint: "CHECK制約は CHECK(条件) の形式",
         answer: "CREATE TABLE order_items (id INTEGER PRIMARY KEY, order_id INTEGER NOT NULL, customer_id INTEGER, amount INTEGER CHECK(amount > 0))",
@@ -481,6 +324,7 @@ export const stages = [
       },
       {
         id: 5,
+        level: 3,
         question: "customers テーブルの age が NULL の行を取得せよ",
         hint: "WHERE age IS NULL",
         answer: "SELECT * FROM customers WHERE age IS NULL",
@@ -489,6 +333,7 @@ export const stages = [
       },
       {
         id: 6,
+        level: 3,
         question: "customers テーブルを削除せよ",
         hint: "DROP TABLE テーブル名",
         answer: "DROP TABLE customers",
@@ -545,6 +390,7 @@ export const stages = [
     problemPool: [
       {
         id: 1,
+        level: 3,
         question: "部門ごとの社員数・平均給与・最高給与を求め、平均給与の高い順に表示せよ",
         hint: "JOIN + GROUP BY + AVG + MAX + ORDER BY",
         answer: "SELECT d.dept_name, COUNT(e.id) AS emp_count, AVG(e.salary) AS avg_salary, MAX(e.salary) AS max_salary FROM departments d LEFT JOIN employees e ON d.dept_id = e.dept_id GROUP BY d.dept_id, d.dept_name ORDER BY avg_salary DESC",
@@ -552,6 +398,7 @@ export const stages = [
       },
       {
         id: 2,
+        level: 3,
         question: "2023年の評価スコアが部門平均を上回る社員の name・dept_name・score を取得せよ",
         hint: "JOIN + WHERE score > (サブクエリで部門平均を取得)",
         answer: "SELECT e.name, d.dept_name, ev.score FROM employees e INNER JOIN departments d ON e.dept_id = d.dept_id INNER JOIN evaluations ev ON e.id = ev.emp_id WHERE ev.year = 2023 AND ev.score > (SELECT AVG(score) FROM evaluations WHERE year = 2023)",
@@ -559,6 +406,7 @@ export const stages = [
       },
       {
         id: 3,
+        level: 3,
         question: "WITH句を使い、部門ごとのプロジェクト総コストを集計し、予算（budget）を超えている部門の dept_name・budget・総コストを取得せよ",
         hint: "WITH proj_total AS (...) SELECT ... FROM proj_total JOIN departments ... WHERE 総コスト > budget",
         answer: "WITH proj_total AS (SELECT dept_id, SUM(cost) AS total_cost FROM projects GROUP BY dept_id) SELECT d.dept_name, d.budget, pt.total_cost FROM proj_total pt INNER JOIN departments d ON pt.dept_id = d.dept_id WHERE pt.total_cost > d.budget",
@@ -566,6 +414,7 @@ export const stages = [
       },
       {
         id: 4,
+        level: 3,
         question: "2020年以降に入社した社員のうち、2023年の評価スコアが4以上の社員の name と score を取得せよ",
         hint: "JOIN evaluations + WHERE hired_year >= 2020 AND score >= 4 AND year = 2023",
         answer: "SELECT e.name, ev.score FROM employees e INNER JOIN evaluations ev ON e.id = ev.emp_id WHERE e.hired_year >= 2020 AND ev.year = 2023 AND ev.score >= 4",
@@ -573,6 +422,7 @@ export const stages = [
       },
       {
         id: 5,
+        level: 3,
         question: "各社員について、直近2年間（2022・2023年）の評価スコアの合計を name と一緒に取得し、合計スコアの高い順に表示せよ（評価が1年しかない社員も含む）",
         hint: "LEFT JOIN evaluations + WHERE year IN (2022, 2023) + GROUP BY + SUM + ORDER BY",
         answer: "SELECT e.name, SUM(ev.score) AS total_score FROM employees e LEFT JOIN evaluations ev ON e.id = ev.emp_id AND ev.year IN (2022, 2023) GROUP BY e.id, e.name ORDER BY total_score DESC",
@@ -580,6 +430,7 @@ export const stages = [
       },
       {
         id: 6,
+        level: 3,
         question: "「進行中」のプロジェクトを持つ部門に所属する社員の中で、給与が500000以上の社員の name・salary・dept_name を取得せよ",
         hint: "WHERE dept_id IN (SELECT dept_id FROM projects WHERE status = '進行中') AND salary >= 500000",
         answer: "SELECT e.name, e.salary, d.dept_name FROM employees e INNER JOIN departments d ON e.dept_id = d.dept_id WHERE e.dept_id IN (SELECT dept_id FROM projects WHERE status = '進行中') AND e.salary >= 500000",
@@ -587,6 +438,7 @@ export const stages = [
       },
       {
         id: 7,
+        level: 3,
         question: "WITH句で社員ごとの2023年スコアを定義し、スコアが5の社員の salary を 10% 増やす UPDATE 文を書け",
         hint: "通常の UPDATE + WHERE id IN (SELECT ... FROM evaluations WHERE ...)",
         answer: "UPDATE employees SET salary = salary * 1.1 WHERE id IN (SELECT emp_id FROM evaluations WHERE year = 2023 AND score = 5)",
@@ -595,11 +447,73 @@ export const stages = [
       },
       {
         id: 8,
+        level: 3,
         question: "部門ごとの平均給与をWITH句で定義し、自部門の平均給与より高い社員の name・dept_name・salary・部門平均給与を取得せよ",
         hint: "WITH dept_avg AS (SELECT dept_id, AVG(salary) ...) SELECT ... JOIN dept_avg ON ... WHERE salary > avg_salary",
         answer: "WITH dept_avg AS (SELECT dept_id, AVG(salary) AS avg_salary FROM employees GROUP BY dept_id) SELECT e.name, d.dept_name, e.salary, da.avg_salary FROM employees e INNER JOIN departments d ON e.dept_id = d.dept_id INNER JOIN dept_avg da ON e.dept_id = da.dept_id WHERE e.salary > da.avg_salary",
         explanation: "WITH句で部門平均を集計し、それをJOINして各社員の給与と比較する。相関サブクエリより可読性が高い。",
       },
+    ],
+  },
+
+  // ===== Stage 9: ECサイト実務編 =====
+  {
+    id: 9,
+    title: "ECサイト実務編",
+    emoji: "🛒",
+    description: "注文・顧客・商品データを使った実務SQL",
+    setup: `
+      CREATE TABLE customers (
+        customer_id INTEGER PRIMARY KEY, name TEXT, prefecture TEXT, age INTEGER
+      );
+      INSERT INTO customers VALUES
+        (1,'山田太郎','東京',28),(2,'鈴木花子','大阪',35),
+        (3,'田中一郎','東京',42),(4,'佐藤美咲','福岡',25),
+        (5,'伊藤健二','神奈川',31),(6,'渡辺さくら','東京',29),
+        (7,'中村雄一','大阪',38),(8,'小林真由','愛知',22);
+
+      CREATE TABLE products (
+        product_id INTEGER PRIMARY KEY, product_name TEXT, category TEXT, price INTEGER
+      );
+      INSERT INTO products VALUES
+        (1,'ノートPC','電子機器',98000),(2,'スマートフォン','電子機器',75000),
+        (3,'ワイヤレスイヤホン','電子機器',15000),(4,'デスクチェア','家具',35000),
+        (5,'デスク','家具',28000),(6,'ビジネスバッグ','バッグ',12000),
+        (7,'財布','バッグ',8000),(8,'モニター','電子機器',45000);
+
+      CREATE TABLE orders (
+        order_id INTEGER PRIMARY KEY, customer_id INTEGER,
+        order_date TEXT, status TEXT
+      );
+      INSERT INTO orders VALUES
+        (1,1,'2024-01-15','完了'),(2,2,'2024-01-20','完了'),
+        (3,1,'2024-02-03','完了'),(4,3,'2024-02-10','キャンセル'),
+        (5,4,'2024-02-15','完了'),(6,2,'2024-03-01','完了'),
+        (7,5,'2024-03-05','完了'),(8,6,'2024-03-10','完了'),
+        (9,1,'2024-03-15','完了'),(10,7,'2024-03-20','完了'),
+        (11,3,'2024-04-01','完了'),(12,8,'2024-04-05','キャンセル');
+
+      CREATE TABLE order_items (
+        item_id INTEGER PRIMARY KEY, order_id INTEGER,
+        product_id INTEGER, quantity INTEGER, unit_price INTEGER
+      );
+      INSERT INTO order_items VALUES
+        (1,1,1,1,98000),(2,1,3,2,15000),(3,2,2,1,75000),
+        (4,3,4,1,35000),(5,5,6,1,12000),(6,5,7,2,8000),
+        (7,6,8,1,45000),(8,7,1,1,98000),(9,7,3,1,15000),
+        (10,8,2,1,75000),(11,9,5,1,28000),(12,10,4,1,35000),
+        (13,11,8,2,45000),(14,11,3,3,15000);
+    `,
+    tableNames: ["customers", "products", "orders", "order_items"],
+    problemPool: [
+      { id: 1, level: 2, question: "完了ステータスの注文件数を取得せよ", hint: "WHERE status = '完了' + COUNT(*)", answer: "SELECT COUNT(*) FROM orders WHERE status = '完了'", explanation: "WHERE で絞り込んでから COUNT する基本パターン。" },
+      { id: 2, level: 2, question: "商品カテゴリ一覧を重複なしで取得し、アルファベット順に並べよ", hint: "SELECT DISTINCT category FROM products ORDER BY category", answer: "SELECT DISTINCT category FROM products ORDER BY category", explanation: "DISTINCT で重複排除、ORDER BY で並び替え。マスタデータの確認に使う。" },
+      { id: 3, level: 2, question: "カテゴリごとの商品数と平均価格を取得せよ", hint: "GROUP BY category + COUNT + AVG", answer: "SELECT category, COUNT(*) AS product_count, AVG(price) AS avg_price FROM products GROUP BY category", explanation: "GROUP BY で集計する基本パターン。商品ラインナップの分析に使う。" },
+      { id: 4, level: 2, question: "顧客名と注文日を一覧で取得せよ（INNER JOIN）", hint: "JOIN orders ON customers.customer_id = orders.customer_id", answer: "SELECT customers.name, orders.order_date FROM customers INNER JOIN orders ON customers.customer_id = orders.customer_id", explanation: "顧客と注文を結合する最も基本的なパターン。" },
+      { id: 5, level: 3, question: "顧客ごとの注文合計金額を高い順に取得せよ（order_items の unit_price × quantity を集計）", hint: "JOIN order_items + GROUP BY customer_id + SUM(quantity * unit_price)", answer: "SELECT c.name, SUM(oi.quantity * oi.unit_price) AS total FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id INNER JOIN order_items oi ON o.order_id = oi.order_id WHERE o.status = '完了' GROUP BY c.customer_id, c.name ORDER BY total DESC", explanation: "3テーブルJOIN + 集計。quantity × unit_price で売上金額を計算する実務頻出パターン。" },
+      { id: 6, level: 3, question: "最も多く売れた商品（数量ベース）のTOP3を取得せよ", hint: "JOIN order_items + GROUP BY product_id + SUM(quantity) + ORDER BY + LIMIT 3", answer: "SELECT p.product_name, SUM(oi.quantity) AS total_qty FROM products p INNER JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.product_id, p.product_name ORDER BY total_qty DESC LIMIT 3", explanation: "売れ筋ランキングは SUM(quantity) で集計して ORDER BY DESC LIMIT N で取得する。" },
+      { id: 7, level: 3, question: "2回以上注文したリピーター顧客の名前と注文回数を取得せよ", hint: "JOIN + GROUP BY customer_id + HAVING COUNT(*) >= 2", answer: "SELECT c.name, COUNT(o.order_id) AS order_count FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name HAVING COUNT(o.order_id) >= 2", explanation: "リピーター分析はHAVING COUNT >= 2 で実現。顧客ロイヤルティ分析の基本。" },
+      { id: 8, level: 3, question: "一度も注文していない顧客の名前を取得せよ", hint: "WHERE customer_id NOT IN (SELECT customer_id FROM orders)", answer: "SELECT name FROM customers WHERE customer_id NOT IN (SELECT customer_id FROM orders)", explanation: "未購入顧客の抽出はNOT INサブクエリが定番。休眠顧客へのアプローチ施策に使う。" },
     ],
   },
 ];

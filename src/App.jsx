@@ -6,10 +6,11 @@ import "./App.css";
 
 export default function App() {
   const { loading, error, runQuery, runDML, runExpected } = useSqlJs();
-  const [screen, setScreen] = useState("select"); // 'select' | 'challenge' | 'clear'
+  const [screen, setScreen] = useState("select");
   const [currentStage, setCurrentStage] = useState(null);
   const [clearedStages, setClearedStages] = useState([]);
   const [lastResult, setLastResult] = useState(null);
+  const [difficulty, setDifficulty] = useState("normal");
 
   function handleSelectStage(stage) {
     setCurrentStage(stage);
@@ -36,11 +37,7 @@ export default function App() {
   }
 
   if (error) {
-    return (
-      <div className="loading">
-        <p>⚠️ エラー: {error}</p>
-      </div>
-    );
+    return <div className="loading"><p>⚠️ エラー: {error}</p></div>;
   }
 
   if (screen === "clear" && lastResult) {
@@ -50,13 +47,7 @@ export default function App() {
     return (
       <div className="clear-screen">
         <div className={`clear-card ${cleared ? "cleared" : "gave-up"}`}>
-          {perfect ? (
-            <h1>🏆 PERFECT!</h1>
-          ) : cleared ? (
-            <h1>✅ STAGE CLEAR!</h1>
-          ) : (
-            <h1>📝 結果</h1>
-          )}
+          {perfect ? <h1>🏆 PERFECT!</h1> : cleared ? <h1>✅ STAGE CLEAR!</h1> : <h1>📝 結果</h1>}
           <p className="clear-stage">{currentStage.emoji} {currentStage.title}</p>
           <p className="clear-score">正解: {score} / {total}</p>
           {gaveUpCount > 0 && (
@@ -79,6 +70,7 @@ export default function App() {
     return (
       <Challenge
         stage={currentStage}
+        difficulty={difficulty}
         onClear={handleClear}
         onBack={() => setScreen("select")}
         runQuery={runQuery}
@@ -91,6 +83,8 @@ export default function App() {
   return (
     <StageSelect
       clearedStages={clearedStages}
+      difficulty={difficulty}
+      onDifficulty={setDifficulty}
       onSelect={handleSelectStage}
     />
   );

@@ -89,6 +89,57 @@ button { -webkit-tap-highlight-color: transparent; }
   color: var(--muted);
 }
 
+/* ========== 難易度セレクター ========== */
+.difficulty-selector {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.diff-btn {
+  background: var(--surface2);
+  border: 2px solid transparent;
+  color: var(--muted);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.diff-btn:hover { color: var(--text); border-color: var(--surface2); }
+.diff-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+.difficulty-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* 不正解時の解説 */
+.wrong-explanation {
+  background: var(--surface2);
+  border-left: 3px solid var(--yellow);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+}
+
+.wrong-explanation-label {
+  font-size: 0.8rem;
+  color: var(--yellow);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.wrong-explanation p:last-child {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
 .stage-grid {
   display: flex;
   flex-direction: column;
@@ -350,6 +401,176 @@ button { -webkit-tap-highlight-color: transparent; }
 .cm-editor {
   border-radius: 8px;
   overflow: hidden;
+}
+
+/* ========== 入力モード切り替えヘッダー ========== */
+.input-mode-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.input-mode-header h3 {
+  margin-bottom: 0;
+}
+
+.mode-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--muted);
+  color: var(--muted);
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.mode-toggle-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ========== SQLビルダー（モバイルモード） ========== */
+.sql-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.builder-answer {
+  min-height: 60px;
+  background: #0d1117;
+  border: 1px solid var(--surface2);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.builder-placeholder {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  align-self: center;
+}
+
+.builder-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.builder-undo {
+  background: var(--surface2);
+  border: 1px solid var(--muted);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.builder-undo:hover { border-color: var(--accent); color: var(--accent); }
+
+.builder-clear {
+  background: transparent;
+  border: 1px solid var(--red);
+  color: var(--red);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.builder-clear:hover { opacity: 1; }
+
+.token-wrap { display: inline-flex; }
+
+.token-remove {
+  margin-left: 5px;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  font-style: normal;
+}
+
+.builder-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: var(--surface2);
+  border-radius: 8px;
+  min-height: 50px;
+}
+
+/* ========== トークンチップ ========== */
+.token {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: transform 0.1s, opacity 0.1s;
+  user-select: none;
+}
+
+.token:active { transform: scale(0.93); }
+
+/* 種別ごとの色 */
+.token-kw   { background: #1e3a5f; color: #569cd6; border-color: #2a4f7a; }
+.token-str  { background: #3d1f0d; color: #ce9178; border-color: #5c3015; }
+.token-num  { background: #1a3020; color: #b5cea8; border-color: #2a4a30; }
+.token-op   { background: #2a2a2a; color: #d4d4d4; border-color: #3a3a3a; }
+.token-id   { background: #1a2a3a; color: #9cdcfe; border-color: #254060; }
+.token-punct{ background: #2a2a2a; color: #808080; border-color: #3a3a3a; }
+
+/* 選択済みトークンは少し明るく */
+.token.selected {
+  opacity: 0.9;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ========== 挿入ポイント ========== */
+.insert-point {
+  background: transparent;
+  border: 1px dashed var(--muted);
+  color: var(--muted);
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  flex-shrink: 0;
+  padding: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.insert-point.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(99, 179, 237, 0.15);
+}
+
+.insert-point:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.token-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .run-btn {

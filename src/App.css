@@ -1,0 +1,696 @@
+/* ========== リセット & ベース ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #252836;
+  --accent: #63b3ed;
+  --accent2: #4fd1c5;
+  --green: #48bb78;
+  --red: #fc8181;
+  --yellow: #f6e05e;
+  --text: #e2e8f0;
+  --muted: #718096;
+  --radius: 12px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", "Hiragino Sans", sans-serif;
+  min-height: 100vh;
+  /* iOS セーフエリア対応 */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* タップ時のハイライト除去 */
+button { -webkit-tap-highlight-color: transparent; }
+
+/* ========== ローディング ========== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 16px;
+  color: var(--muted);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--surface2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========== ホームレイアウト（2カラム） ========== */
+.home-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  align-items: start;
+}
+
+/* ========== ステージ選択 ========== */
+.stage-select {
+  min-width: 0;
+}
+
+.stage-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.stage-header h1 {
+  font-size: 2rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.stage-header p {
+  color: var(--muted);
+}
+
+.stage-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stage-card {
+  background: var(--surface);
+  border: 2px solid var(--surface2);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 4px 12px;
+  align-items: center;
+  text-align: left;
+  transition: border-color 0.2s, transform 0.1s;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.stage-card:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.stage-card.cleared {
+  border-color: var(--green);
+}
+
+.stage-card.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stage-emoji {
+  font-size: 2rem;
+  grid-row: 1 / 3;
+}
+
+.stage-num {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.stage-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.stage-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  grid-column: 2;
+}
+
+.clear-badge {
+  font-size: 0.8rem;
+  color: var(--green);
+  grid-row: 1 / 3;
+}
+
+.lock-badge {
+  font-size: 1.2rem;
+  grid-row: 1 / 3;
+}
+
+/* ========== チャレンジ画面 ========== */
+.challenge {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.challenge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 8px;
+}
+
+.back-btn {
+  background: var(--surface2);
+  border: none;
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.back-btn:hover {
+  background: var(--surface);
+  color: var(--accent);
+}
+
+.stage-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9rem;
+  gap: 2px;
+}
+
+.progress {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.score-badge {
+  background: var(--accent);
+  color: var(--bg);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* ========== パネル ========== */
+.challenge-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  border: 1px solid var(--surface2);
+}
+
+.panel h3 {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ========== 問題パネル ========== */
+.question-text {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.hint {
+  background: var(--surface2);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--yellow);
+  border-left: 3px solid var(--yellow);
+  margin-top: 8px;
+}
+
+.question-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hint-btn {
+  background: transparent;
+  border: 1px solid var(--muted);
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.hint-btn:hover {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.giveup-btn {
+  background: transparent;
+  border: 1px solid var(--red);
+  color: var(--red);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.giveup-btn:hover {
+  opacity: 1;
+}
+
+.answer-reveal {
+  margin-top: 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 12px;
+  border-left: 3px solid var(--green);
+}
+
+.answer-label {
+  font-size: 0.8rem;
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.answer-code,
+.sql-highlight {
+  display: block;
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: #1e1e1e;
+  padding: 10px 12px;
+  border-radius: 6px;
+  line-height: 1.7;
+}
+
+.explanation {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  background: var(--surface);
+  padding: 8px 10px;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+
+.model-answer {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 12px;
+  border-left: 3px solid var(--accent);
+  margin-bottom: 12px;
+}
+
+.model-answer-label {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+/* ========== SQL入力（CodeMirror） ========== */
+.cm-editor {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.run-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.run-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.run-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ========== 結果パネル ========== */
+.result-panel.correct {
+  border-color: var(--green);
+}
+
+.result-panel.wrong {
+  border-color: var(--red);
+}
+
+.result-panel.error {
+  border-color: var(--yellow);
+}
+
+.judge {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.judge.correct { color: var(--green); }
+.judge.wrong { color: var(--red); }
+.judge.error { color: var(--yellow); }
+
+.next-btn {
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 12px;
+  width: 100%;
+  transition: opacity 0.2s;
+}
+
+.next-btn:hover {
+  opacity: 0.85;
+}
+
+/* ========== 結果テーブル ========== */
+.result-table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.result-table th {
+  background: var(--surface2);
+  color: var(--accent);
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 2px solid var(--accent);
+}
+
+.result-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--surface2);
+  color: var(--text);
+}
+
+.result-table tr:last-child td {
+  border-bottom: none;
+}
+
+.result-table tr:hover td {
+  background: var(--surface2);
+}
+
+.no-result {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ========== クリア画面 ========== */
+.clear-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.clear-card {
+  background: var(--surface);
+  border: 2px solid var(--green);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+}
+
+.clear-card h1 {
+  font-size: 2rem;
+  color: var(--green);
+  margin-bottom: 16px;
+}
+
+.clear-stage {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.clear-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+.clear-card.gave-up {
+  border-color: var(--muted);
+}
+
+.gave-up-count {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.large-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.large-btn:hover {
+  opacity: 0.85;
+}
+
+.retry-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.retry-btn:hover {
+  background: var(--surface2);
+}
+
+/* ========== SQLリファレンス ========== */
+.sql-ref {
+  background: var(--surface);
+  border: 1px solid var(--surface2);
+  border-radius: var(--radius);
+  position: sticky;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sql-ref-header {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--surface2);
+}
+
+.sql-ref-header h2 {
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.sql-ref-header p {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.sql-ref-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--surface2);
+}
+
+.ref-tab {
+  background: var(--surface2);
+  border: 1px solid transparent;
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.ref-tab:hover {
+  color: var(--text);
+  border-color: var(--surface2);
+}
+
+.ref-tab.active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.sql-ref-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px;
+}
+
+.ref-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.ref-item:hover {
+  background: var(--surface2);
+}
+
+.ref-item.active {
+  background: var(--surface2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ref-item-name {
+  font-weight: 600;
+}
+
+.ref-item-toggle {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.ref-detail {
+  background: #0d1117;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0 0 6px 0;
+}
+
+.ref-syntax {
+  font-family: "Courier New", monospace;
+  font-size: 0.8rem;
+  color: var(--yellow);
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.ref-desc {
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.ref-example,
+.ref-detail .sql-highlight {
+  display: block;
+  font-size: 0.78rem;
+  border-top: 1px solid var(--surface2);
+  padding-top: 8px;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 0;
+}
+
+/* ========== レスポンシブ（スマホ対応） ========== */
+@media (max-width: 800px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sql-ref {
+    position: static;
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stage-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .challenge-header {
+    flex-wrap: wrap;
+  }
+
+  .sql-input {
+    font-size: 0.85rem;
+  }
+}
